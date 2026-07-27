@@ -1,0 +1,21 @@
+# Environnement virtuel
+.venv/
+
+# Fichiers Python temporaires
+__pycache__/
+*.pyc
+
+# Fichiers Jupyter temporaires
+.ipynb_checkpoints/
+
+# Paramètres VS Code
+.vscode/
+
+# Gros fichiers de données
+data/processed/energy_features_1h.csv
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+data/raw/time_series_60min_singleindex.csv
+data/raw/weather_data.csv

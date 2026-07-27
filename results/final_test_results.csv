@@ -1,0 +1,4 @@
+Cible,Modèle retenu,MAE_test,RMSE_test,R2_test
+Demande électrique,HistGradientBoosting,200.83210917167054,271.5564466206044,0.997089732833962
+Production photovoltaïque,HistGradientBoosting,269.94537957727397,470.2147845830911,0.9895252835459757
+Production éolienne,Régression linéaire,169.9298614391491,264.1562061432184,0.9516624663929815

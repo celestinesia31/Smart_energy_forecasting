@@ -1,0 +1,7 @@
+Cible,Modèle,MAE_validation,RMSE_validation,R2_validation
+Demande électrique,HistGradientBoosting,215.12045446925865,285.64525418885313,0.9962450502391926
+Demande électrique,Régression linéaire,262.392167986481,344.3210883834737,0.994543962460503
+Production photovoltaïque,HistGradientBoosting,337.6583704744354,556.892790774027,0.9879350594061741
+Production photovoltaïque,Régression linéaire,508.6735833038497,708.1134548821893,0.9804931255276943
+Production éolienne,Régression linéaire,197.86819015706934,264.1328313077831,0.9615655213712244
+Production éolienne,HistGradientBoosting,205.2968048498004,273.74773053640223,0.958716427178799
