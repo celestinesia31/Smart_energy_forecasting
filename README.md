@@ -40,33 +40,15 @@ Le projet vise à :
 
 ---
 
-# Organisation du projet
-
-```
-PFE
-│
-├── app
-├── data
-├── figures
-├── models
-├── notebooks
-├── powerbi
-├── results
-├── README.md
-└── requirements.txt
-```
-
----
-
 # Notebooks
 
-- Notebook 01 — Audit des données
-- Notebook 02 — Prétraitement des données
-- Notebook 03 — Analyse exploratoire
-- Notebook 04 — Ingénierie des caractéristiques
-- Notebook 05 — Modélisation prédictive
-- Notebook 06 — Évaluation des modèles
-- Notebook 07 — Dashboard interactif
+- Notebook 01_Audit des données
+- Notebook 02_Prétraitement des données
+- Notebook 03_Analyse exploratoire
+- Notebook 04_Ingénierie des caractéristiques
+- Notebook 05_Modélisation prédictive
+- Notebook 06_Évaluation des modèles
+- Notebook 07_Dashboard interactif
 
 ---
 
