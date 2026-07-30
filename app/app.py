@@ -889,83 +889,136 @@ elif page == "📈 Performances des modèles":
         """
         Les performances présentées ci-dessous ont été calculées sur
         l’ensemble de test, jamais utilisé lors de l’entraînement ni lors
-        de la sélection des modèles.
+        de la sélection des modèles. Les modèles retenus sont comparés à
+        une baseline naïve saisonnière journalière.
         """
     )
 
+    required_columns = {
+        "Cible",
+        "Modèle",
+        "MAE_test",
+        "RMSE_test",
+        "R2_test",
+        "Gain_RMSE_vs_naif_%"
+    }
+
+    missing_columns = required_columns.difference(results_df.columns)
+
+    if missing_columns:
+        st.error(
+            "Le fichier final_test_results.csv ne contient pas toutes "
+            "les colonnes attendues : "
+            + ", ".join(sorted(missing_columns))
+        )
+        st.stop()
+
+    display_results = results_df.copy()
+
+    numeric_columns = [
+        "MAE_test",
+        "RMSE_test",
+        "R2_test",
+        "Gain_RMSE_vs_naif_%"
+    ]
+
+    display_results[numeric_columns] = (
+        display_results[numeric_columns]
+        .round(3)
+    )
+
     st.dataframe(
-        results_df,
+        display_results,
         use_container_width=True,
         hide_index=True
     )
 
-    if "R2_test" in results_df.columns:
+    model_results = results_df[
+        results_df["Modèle"] != "Naïf saisonnier journalier"
+    ].copy()
 
-        r2_figure = px.bar(
-            results_df,
-            x="Cible",
-            y="R2_test",
-            color="Modèle retenu",
-            title="Coefficient de détermination par cible",
-            text_auto=".3f",
-            color_discrete_map={
-                "HistGradientBoosting": "#0f766e",
-                "Régression linéaire": "#f59e0b"
-            }
+    baseline_results = results_df[
+        results_df["Modèle"] == "Naïf saisonnier journalier"
+    ].copy()
+
+    st.markdown(
+        '<h2 class="section-title">Gains par rapport à la baseline</h2>',
+        unsafe_allow_html=True
+    )
+
+    metric_columns = st.columns(
+        max(1, len(model_results))
+    )
+
+    for column, (_, row) in zip(
+        metric_columns,
+        model_results.iterrows()
+    ):
+        column.metric(
+            label=row["Cible"],
+            value=f'{row["Gain_RMSE_vs_naif_%"]:.1f} %',
+            delta="Réduction du RMSE"
         )
 
-        r2_figure.update_traces(
-            textposition="outside"
-        )
+    comparison_results = results_df.copy()
 
-        r2_figure.update_yaxes(
-            range=[
-                max(
-                    0,
-                    results_df["R2_test"].min() - 0.05
-                ),
-                1.01
-            ]
-        )
+    rmse_figure = px.bar(
+        comparison_results,
+        x="Cible",
+        y="RMSE_test",
+        color="Modèle",
+        barmode="group",
+        title="RMSE : modèles retenus et baseline saisonnière",
+        text_auto=".1f",
+        color_discrete_map={
+            "HistGradientBoosting": "#0f766e",
+            "Régression linéaire": "#f59e0b",
+            "Naïf saisonnier journalier": "#64748b"
+        }
+    )
 
-        r2_figure = apply_energy_theme(
-            r2_figure,
-            height=450
-        )
+    rmse_figure.update_traces(
+        textposition="outside"
+    )
 
-        st.plotly_chart(
-            r2_figure,
-            use_container_width=True
-        )
+    rmse_figure = apply_energy_theme(
+        rmse_figure,
+        height=500
+    )
 
-    if "RMSE_test" in results_df.columns:
+    st.plotly_chart(
+        rmse_figure,
+        use_container_width=True
+    )
 
-        rmse_figure = px.bar(
-            results_df,
-            x="Cible",
-            y="RMSE_test",
-            color="Modèle retenu",
-            title="Erreur RMSE par cible",
-            text_auto=".1f",
-            color_discrete_map={
-                "HistGradientBoosting": "#0f766e",
-                "Régression linéaire": "#f59e0b"
-            }
-        )
+    r2_figure = px.bar(
+        comparison_results,
+        x="Cible",
+        y="R2_test",
+        color="Modèle",
+        barmode="group",
+        title="Coefficient de détermination sur le jeu de test",
+        text_auto=".3f",
+        color_discrete_map={
+            "HistGradientBoosting": "#0f766e",
+            "Régression linéaire": "#f59e0b",
+            "Naïf saisonnier journalier": "#64748b"
+        }
+    )
 
-        rmse_figure.update_traces(
-            textposition="outside"
-        )
+    r2_figure.update_traces(
+        textposition="outside"
+    )
 
-        rmse_figure = apply_energy_theme(
-            rmse_figure,
-            height=450
-        )
+    r2_figure = apply_energy_theme(
+        r2_figure,
+        height=500
+    )
 
-        st.plotly_chart(
-            rmse_figure,
-            use_container_width=True
-        )
+    st.plotly_chart(
+        r2_figure,
+        use_container_width=True
+    )
 
     csv_data = (
         results_df
