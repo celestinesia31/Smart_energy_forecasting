@@ -1,4 +1,6 @@
-# APPLICATION STREAMLIT PRÉVISION ÉNERGÉTIQUE
+# ============================================================
+# APPLICATION STREAMLIT - PRÉVISION ÉNERGÉTIQUE H+1
+# ============================================================
 
 from pathlib import Path
 
@@ -7,8 +9,9 @@ import plotly.express as px
 import streamlit as st
 
 
+# ============================================================
 # 1. CONFIGURATION DE LA PAGE
-
+# ============================================================
 
 st.set_page_config(
     page_title="Prévision énergétique",
@@ -18,205 +21,241 @@ st.set_page_config(
 )
 
 
+# ============================================================
 # 2. THÈME VISUEL PERSONNALISÉ
+# ============================================================
 
 st.markdown(
     """
-    <style>
-    @import url(
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
-    );
+<style>
 
-    html, body, [class*="css"] {
-        font-family: "Inter", sans-serif;
-    }
+@import url(
+'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
+);
 
-    .stApp {
-        background:
-            linear-gradient(
-                135deg,
-                #f4f8fb 0%,
-                #edf7f5 55%,
-                #fff9e8 100%
-            );
-        color: #132238;
-    }
+html, body, [class*="css"] {
+    font-family: "Inter", sans-serif;
+}
 
-    .main .block-container {
-        max-width: 1450px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
+.stApp {
+    background:
+        linear-gradient(
+            135deg,
+            #f4f8fb 0%,
+            #edf7f5 55%,
+            #fff9e8 100%
+        );
+    color: #132238;
+}
 
-    section[data-testid="stSidebar"] {
-        background:
-            linear-gradient(
-                180deg,
-                #102a43 0%,
-                #164e63 100%
-            );
-        border-right: 1px solid rgba(255, 255, 255, 0.10);
-    }
+.main .block-container {
+    max-width: 1450px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
 
-    section[data-testid="stSidebar"] * {
-        color: #f8fafc;
-    }
+/* ---------------- SIDEBAR ---------------- */
 
-    section[data-testid="stSidebar"] hr {
-        border-color: rgba(255, 255, 255, 0.20);
-    }
+section[data-testid="stSidebar"] {
+    background:
+        linear-gradient(
+            180deg,
+            #102a43 0%,
+            #164e63 100%
+        );
+    border-right: 1px solid rgba(255, 255, 255, 0.10);
+}
 
-    section[data-testid="stSidebar"]
-    div[data-testid="stRadio"] label {
-        padding: 0.45rem 0.55rem;
-        border-radius: 0.65rem;
-        transition: 0.2s ease;
-    }
+section[data-testid="stSidebar"] * {
+    color: #f8fafc;
+}
 
-    section[data-testid="stSidebar"]
-    div[data-testid="stRadio"] label:hover {
-        background-color: rgba(255, 255, 255, 0.10);
-    }
+section[data-testid="stSidebar"] hr {
+    border-color: rgba(255, 255, 255, 0.20);
+}
 
-    h1, h2, h3 {
-        color: #102a43;
-        letter-spacing: -0.02em;
-    }
+section[data-testid="stSidebar"]
+div[data-testid="stRadio"] label {
+    padding: 0.45rem 0.55rem;
+    border-radius: 0.65rem;
+    transition: 0.2s ease;
+}
 
-    h1 {
-        font-weight: 700;
-    }
+section[data-testid="stSidebar"]
+div[data-testid="stRadio"] label:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+}
 
-    div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(15, 118, 110, 0.18);
-        border-left: 5px solid #0f766e;
-        border-radius: 1rem;
-        padding: 1rem 1.1rem;
-        box-shadow: 0 8px 24px rgba(16, 42, 67, 0.08);
-        min-height: 125px;
-    }
+/* ---------------- TITRES ---------------- */
 
-    div[data-testid="stMetricLabel"] {
-        color: #486581;
-        font-weight: 600;
-    }
+h1, h2, h3 {
+    color: #102a43;
+    letter-spacing: -0.02em;
+}
 
-    div[data-testid="stMetricValue"] {
-        color: #102a43;
-        font-weight: 700;
-    }
+h1 {
+    font-weight: 700;
+}
 
-    div[data-testid="stDataFrame"] {
-        background-color: white;
-        border: 1px solid #d9e2ec;
-        border-radius: 0.9rem;
-        overflow: hidden;
-        box-shadow: 0 6px 18px rgba(16, 42, 67, 0.06);
-    }
+/* ---------------- KPI ---------------- */
 
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="input"] > div {
-        background-color: rgba(255, 255, 255, 0.96);
-        border-radius: 0.75rem;
-    }
+div[data-testid="stMetric"] {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(15, 118, 110, 0.18);
+    border-left: 5px solid #0f766e;
+    border-radius: 1rem;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 8px 24px rgba(16, 42, 67, 0.08);
+    min-height: 125px;
+}
 
-    .stButton > button,
-    .stDownloadButton > button {
-        background:
-            linear-gradient(
-                90deg,
-                #0f766e,
-                #0891b2
-            );
-        color: white;
-        border: none;
-        border-radius: 0.75rem;
-        padding: 0.65rem 1rem;
-        font-weight: 650;
-        box-shadow: 0 6px 16px rgba(15, 118, 110, 0.20);
-        transition: 0.2s ease;
-    }
+div[data-testid="stMetricLabel"] {
+    color: #486581;
+    font-weight: 600;
+}
 
-    .stButton > button:hover,
-    .stDownloadButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(15, 118, 110, 0.30);
-        color: white;
-    }
+div[data-testid="stMetricValue"] {
+    color: #102a43;
+    font-weight: 700;
+    font-size: 1.75rem;
+}
 
-    .hero {
-        background:
-            linear-gradient(
-                120deg,
-                #102a43 0%,
-                #0f766e 65%,
-                #0891b2 100%
-            );
-        padding: 2.2rem 2.3rem;
-        border-radius: 1.3rem;
-        color: white;
-        box-shadow: 0 16px 40px rgba(16, 42, 67, 0.20);
-        margin-bottom: 1.6rem;
-    }
+/* ---------------- TABLEAUX ---------------- */
 
-    .hero h1 {
-        color: white;
-        margin: 0;
-        font-size: 2.7rem;
-    }
+div[data-testid="stDataFrame"] {
+    background-color: white;
+    border: 1px solid #d9e2ec;
+    border-radius: 0.9rem;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(16, 42, 67, 0.06);
+}
 
-    .hero p {
-        color: #e0f2fe;
-        font-size: 1.08rem;
-        margin-top: 0.7rem;
-        margin-bottom: 0;
-        max-width: 900px;
-    }
+/* ---------------- INPUTS ---------------- */
 
-    .hero-badge {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.14);
-        border: 1px solid rgba(255, 255, 255, 0.24);
-        padding: 0.35rem 0.75rem;
-        border-radius: 999px;
-        margin-bottom: 0.9rem;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #fef3c7;
-    }
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div {
+    background-color: rgba(255, 255, 255, 0.96);
+    border-radius: 0.75rem;
+}
 
-    .info-card {
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid #d9e2ec;
-        border-radius: 1rem;
-        padding: 1.15rem;
-        min-height: 165px;
-        box-shadow: 0 8px 22px rgba(16, 42, 67, 0.07);
-    }
+/* ---------------- BOUTONS ---------------- */
 
-    .info-card h3 {
-        margin-top: 0;
-        color: #0f766e;
-    }
+.stButton > button,
+.stDownloadButton > button {
+    background:
+        linear-gradient(
+            90deg,
+            #0f766e,
+            #0891b2
+        );
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.65rem 1rem;
+    font-weight: 650;
+    box-shadow: 0 6px 16px rgba(15, 118, 110, 0.20);
+    transition: 0.2s ease;
+}
 
-    .section-title {
-        margin-top: 1.8rem;
-        margin-bottom: 0.8rem;
-        padding-left: 0.8rem;
-        border-left: 5px solid #f59e0b;
-    }
+.stButton > button:hover,
+.stDownloadButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(15, 118, 110, 0.30);
+    color: white;
+}
 
-    footer {
-        visibility: hidden;
-    }
-    </style>
+/* ---------------- HERO ACCUEIL ---------------- */
+
+.hero {
+    background:
+        linear-gradient(
+            120deg,
+            #102a43 0%,
+            #0f766e 65%,
+            #0891b2 100%
+        );
+    padding: 2.2rem 2.3rem;
+    border-radius: 1.3rem;
+    color: white;
+    box-shadow: 0 16px 40px rgba(16, 42, 67, 0.20);
+    margin-bottom: 1.6rem;
+}
+
+.hero h1 {
+    color: white;
+    margin: 0;
+    font-size: 2.7rem;
+}
+
+.hero p {
+    color: #e0f2fe;
+    font-size: 1.08rem;
+    margin-top: 0.7rem;
+    margin-bottom: 0;
+    max-width: 900px;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    margin-bottom: 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fef3c7;
+}
+
+/* ---------------- CARTES ---------------- */
+
+.info-card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #d9e2ec;
+    border-radius: 1rem;
+    padding: 1.15rem;
+    min-height: 165px;
+    box-shadow: 0 8px 22px rgba(16, 42, 67, 0.07);
+}
+
+.info-card h3 {
+    margin-top: 0;
+    color: #0f766e;
+}
+
+.section-title {
+    margin-top: 1.8rem;
+    margin-bottom: 0.8rem;
+    padding-left: 0.8rem;
+    border-left: 5px solid #f59e0b;
+}
+
+.forecast-box {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #d9e2ec;
+    border-radius: 1rem;
+    padding: 1.2rem 1.4rem;
+    box-shadow: 0 8px 22px rgba(16, 42, 67, 0.07);
+    margin-bottom: 1rem;
+}
+
+.forecast-box h3 {
+    margin-top: 0;
+}
+
+footer {
+    visibility: hidden;
+}
+
+</style>
     """,
     unsafe_allow_html=True
 )
 
 
+# ============================================================
 # 3. DÉFINITION DES CHEMINS
+# ============================================================
 
 APP_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = APP_DIR.parent
@@ -227,15 +266,17 @@ FIGURES_DIR = PROJECT_DIR / "figures"
 
 DASHBOARD_DATA_FILE = DATA_DIR / "dashboard_data.csv"
 FINAL_RESULTS_FILE = RESULTS_DIR / "final_test_results.csv"
+POWERBI_PREDICTIONS_FILE = RESULTS_DIR / "powerbi_predictions.csv"
+WALK_FORWARD_SUMMARY_FILE = RESULTS_DIR / "walk_forward_summary.csv"
+EXTERNAL_VALIDATION_FILE = RESULTS_DIR / "external_validation_germany.csv"
 
 
+# ============================================================
 # 4. CHARGEMENT DES DONNÉES
+# ============================================================
 
 @st.cache_data
 def load_dashboard_data() -> pd.DataFrame:
-    """
-    Charge le dataset léger utilisé par le dashboard.
-    """
 
     if not DASHBOARD_DATA_FILE.exists():
         raise FileNotFoundError(
@@ -256,9 +297,6 @@ def load_dashboard_data() -> pd.DataFrame:
 
 @st.cache_data
 def load_final_results() -> pd.DataFrame:
-    """
-    Charge les résultats finaux obtenus sur le jeu de test.
-    """
 
     if not FINAL_RESULTS_FILE.exists():
         raise FileNotFoundError(
@@ -268,28 +306,88 @@ def load_final_results() -> pd.DataFrame:
     return pd.read_csv(FINAL_RESULTS_FILE)
 
 
+@st.cache_data
+def load_test_predictions() -> pd.DataFrame:
+    """
+    Charge les prédictions finales réalisées sur le jeu de test.
+
+    Pour chaque instant t, les colonnes de prédiction correspondent
+    à une prévision à l'horizon H+1.
+    """
+
+    if not POWERBI_PREDICTIONS_FILE.exists():
+        raise FileNotFoundError(
+            f"Fichier introuvable : {POWERBI_PREDICTIONS_FILE}"
+        )
+
+    dataframe = pd.read_csv(
+        POWERBI_PREDICTIONS_FILE,
+        parse_dates=["Time"]
+    )
+
+    return (
+        dataframe
+        .sort_values("Time")
+        .reset_index(drop=True)
+    )
+
+
+@st.cache_data
+def load_walk_forward_summary() -> pd.DataFrame:
+    """
+    Charge la synthèse de la validation temporelle walk-forward.
+    """
+
+    if not WALK_FORWARD_SUMMARY_FILE.exists():
+        raise FileNotFoundError(
+            f"Fichier introuvable : {WALK_FORWARD_SUMMARY_FILE}"
+        )
+
+    return pd.read_csv(WALK_FORWARD_SUMMARY_FILE)
+
+
+@st.cache_data
+def load_external_validation() -> pd.DataFrame:
+    """
+    Charge les résultats de la validation externe sur les données allemandes.
+    """
+
+    if not EXTERNAL_VALIDATION_FILE.exists():
+        raise FileNotFoundError(
+            f"Fichier introuvable : {EXTERNAL_VALIDATION_FILE}"
+        )
+
+    return pd.read_csv(EXTERNAL_VALIDATION_FILE)
+
+
 try:
+
     energy_df = load_dashboard_data()
     results_df = load_final_results()
+    predictions_df = load_test_predictions()
+    walk_forward_df = load_walk_forward_summary()
+    external_validation_df = load_external_validation()
 
 except FileNotFoundError as error:
+
     st.error(str(error))
+
     st.info(
-        "Exécute d’abord le Notebook 07 afin de créer "
-        "`dashboard_data.csv`."
+        "Exécute d'abord les notebooks nécessaires afin de créer "
+        "les fichiers de données et de résultats."
     )
+
     st.stop()
 
 
+# ============================================================
 # 5. FONCTIONS UTILITAIRES
+# ============================================================
 
 def apply_energy_theme(
     figure,
     height: int = 500
 ):
-    """
-    Applique un thème graphique cohérent avec le dashboard.
-    """
 
     figure.update_layout(
         height=height,
@@ -345,9 +443,6 @@ def display_time_series(
     y_label: str,
     color: str = "#0891b2"
 ) -> None:
-    """
-    Affiche une série temporelle interactive.
-    """
 
     figure = px.line(
         dataframe,
@@ -385,9 +480,6 @@ def display_real_vs_target(
     title: str,
     y_label: str
 ) -> None:
-    """
-    Compare la valeur actuelle avec la valeur observée une heure plus tard.
-    """
 
     chart_data = dataframe[
         ["Time", real_column, target_column]
@@ -415,14 +507,14 @@ def display_real_vs_target(
         }
     )
 
-    line_colors = [
+    colors = [
         "#0f766e",
         "#f59e0b"
     ]
 
     for trace, color in zip(
         figure.data,
-        line_colors
+        colors
     ):
         trace.update(
             line={
@@ -446,30 +538,71 @@ def show_saved_figure(
     filename: str,
     caption: str
 ) -> None:
-    """
-    Affiche une figure enregistrée si elle existe.
-    """
 
     figure_path = FIGURES_DIR / filename
 
     if figure_path.exists():
+
         st.image(
             str(figure_path),
             caption=caption,
             use_container_width=True
         )
+
     else:
+
         st.warning(
             f"Figure non trouvée : {filename}"
         )
 
 
-# 6. BARRE LATÉRALE
+def format_value(value) -> str:
+
+    if pd.isna(value):
+        return "N/A"
+
+    return f"{float(value):,.2f}".replace(",", " ")
+
+
+# ============================================================
+# 6. PRÉPARATION DES DONNÉES POUR LA DÉMONSTRATION H+1
+# ============================================================
+
+current_values = (
+    energy_df[
+        [
+            "Time",
+            "PV_production",
+            "Wind_production",
+            "Electric_demand"
+        ]
+    ]
+    .drop_duplicates(subset=["Time"])
+    .copy()
+)
+
+demo_df = predictions_df.merge(
+    current_values,
+    on="Time",
+    how="left"
+)
+
+demo_df = (
+    demo_df
+    .sort_values("Time")
+    .reset_index(drop=True)
+)
+
+
+# ============================================================
+# 7. BARRE LATÉRALE
+# ============================================================
 
 st.sidebar.title("⚡ Navigation")
 
 NAVIGATION_OPTIONS = [
     "🏠 Accueil",
+    "🎯 Démonstration H+1",
     "📊 Exploration des données",
     "☀️ Production photovoltaïque",
     "🌬️ Production éolienne",
@@ -487,6 +620,7 @@ page = st.sidebar.radio(
 st.sidebar.divider()
 
 st.sidebar.write("**Période disponible**")
+
 st.sidebar.write(
     f"{energy_df['Time'].min():%d/%m/%Y}"
     f" — "
@@ -499,7 +633,9 @@ st.sidebar.write(
 )
 
 
-# 7. FILTRE TEMPOREL GLOBAL
+# ============================================================
+# 8. FILTRE TEMPOREL GLOBAL
+# ============================================================
 
 minimum_date = energy_df["Time"].min().date()
 maximum_date = energy_df["Time"].max().date()
@@ -515,6 +651,7 @@ if (
     isinstance(selected_dates, tuple)
     and len(selected_dates) == 2
 ):
+
     start_date, end_date = selected_dates
 
     filtered_df = energy_df[
@@ -523,34 +660,43 @@ if (
     ].copy()
 
 else:
+
     filtered_df = energy_df.copy()
 
+
 if filtered_df.empty:
+
     st.warning(
-        "Aucune observation n’est disponible pour cette période."
+        "Aucune observation n'est disponible pour cette période."
     )
+
     st.stop()
 
 
-# 8. TITRE DYNAMIQUE UNIQUE
+# ============================================================
+# 9. TITRE DES PAGES
+# ============================================================
 
 if page != "🏠 Accueil":
     st.title(page)
 
 
-# 9. PAGE ACCUEIL
-
+# ============================================================
+# 10. PAGE ACCUEIL
+# ============================================================
 
 if page == "🏠 Accueil":
 
     st.markdown(
-    """<div class="hero">
+        """
+<div class="hero">
 <div class="hero-badge">⚡ Intelligence artificielle & énergies renouvelables</div>
 <h1>Système intelligent de prévision énergétique</h1>
-<p>Application interactive de prévision à un horizon d’une heure pour la production photovoltaïque, la production éolienne et la demande électrique.</p>
-</div>""",
-    unsafe_allow_html=True
-)
+<p>Application interactive de prévision à un horizon d'une heure pour la production photovoltaïque, la production éolienne et la demande électrique.</p>
+</div>
+        """,
+        unsafe_allow_html=True
+    )
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -582,44 +728,46 @@ if page == "🏠 Accueil":
     card1, card2, card3 = st.columns(3)
 
     with card1:
+
         st.markdown(
             """
-            <div class="info-card">
-                <h3>☀️ Photovoltaïque</h3>
-                <p>
-                    Prévision de la production solaire à partir du
-                    rayonnement, de la température et des caractéristiques
-                    temporelles.
-                </p>
-            </div>
+<div class="info-card">
+<h3>☀️ Photovoltaïque</h3>
+<p>
+Prévision de la production solaire à partir du rayonnement,
+de la température et des caractéristiques temporelles.
+</p>
+</div>
             """,
             unsafe_allow_html=True
         )
 
     with card2:
+
         st.markdown(
             """
-            <div class="info-card">
-                <h3>🌬️ Éolien</h3>
-                <p>
-                    Estimation de la production éolienne en exploitant
-                    la vitesse du vent et l’historique énergétique récent.
-                </p>
-            </div>
+<div class="info-card">
+<h3>🌬️ Éolien</h3>
+<p>
+Estimation de la production éolienne en exploitant la vitesse
+du vent et l'historique énergétique récent.
+</p>
+</div>
             """,
             unsafe_allow_html=True
         )
 
     with card3:
+
         st.markdown(
             """
-            <div class="info-card">
-                <h3>⚡ Demande électrique</h3>
-                <p>
-                    Anticipation de la consommation à partir des cycles
-                    temporels, des conditions météo et des valeurs retardées.
-                </p>
-            </div>
+<div class="info-card">
+<h3>⚡ Demande électrique</h3>
+<p>
+Anticipation de la consommation à partir des cycles temporels,
+des conditions météorologiques et des valeurs retardées.
+</p>
+</div>
             """,
             unsafe_allow_html=True
         )
@@ -642,21 +790,397 @@ if page == "🏠 Accueil":
 
     st.markdown(
         """
-        1. Audit et contrôle de qualité des données  
-        2. Prétraitement  
-        3. Analyse exploratoire  
-        4. Ingénierie des caractéristiques  
-        5. Modélisation prédictive  
-        6. Évaluation finale  
-        7. Application interactive
+1. Audit et contrôle de qualité des données  
+2. Prétraitement  
+3. Analyse exploratoire  
+4. Ingénierie des caractéristiques  
+5. Modélisation prédictive  
+6. Validation temporelle et évaluation finale  
+7. Visualisation et démonstration interactive
         """
     )
 
 
-# 10. PAGE EXPLORATION
+# ============================================================
+# 11. PAGE DÉMONSTRATION H+1
+# ============================================================
+
+elif page == "🎯 Démonstration H+1":
+
+    st.markdown(
+        """
+Cette page illustre concrètement le fonctionnement du système.
+
+Pour un instant **t** appartenant au jeu de test, le modèle utilise les
+informations disponibles à cet instant afin d'estimer la valeur qui sera
+observée **une heure plus tard**.
+
+Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
+à **t + 1 heure**.
+        """
+    )
+
+    st.markdown(
+        '<h2 class="section-title">'
+        'Choisir un instant du jeu de test'
+        '</h2>',
+        unsafe_allow_html=True
+    )
+
+    demo_min_date = demo_df["Time"].min().date()
+    demo_max_date = demo_df["Time"].max().date()
+
+    selected_demo_date = st.date_input(
+        "Date",
+        value=demo_min_date,
+        min_value=demo_min_date,
+        max_value=demo_max_date,
+        key="demo_date"
+    )
+
+    available_times_df = demo_df[
+        demo_df["Time"].dt.date == selected_demo_date
+    ].copy()
+
+    if available_times_df.empty:
+
+        st.warning(
+            "Aucune observation du jeu de test n'est disponible "
+            "pour cette date."
+        )
+
+    else:
+
+        available_times = (
+            available_times_df["Time"]
+            .dt.strftime("%H:%M")
+            .tolist()
+        )
+
+        selected_demo_time = st.selectbox(
+            "Heure de référence",
+            available_times,
+            key="demo_time"
+        )
+
+        selected_timestamp = pd.Timestamp(
+            f"{selected_demo_date} {selected_demo_time}"
+        )
+
+        selected_rows = demo_df[
+            demo_df["Time"] == selected_timestamp
+        ]
+
+        if selected_rows.empty:
+
+            st.warning(
+                "Impossible de retrouver cette observation."
+            )
+
+        else:
+
+            row = selected_rows.iloc[0]
+
+            forecast_timestamp = (
+                selected_timestamp
+                + pd.Timedelta(hours=1)
+            )
+
+            st.success(
+                "Prévision effectuée à "
+                f"{selected_timestamp:%d/%m/%Y %H:%M} "
+                "pour l'horizon "
+                f"{forecast_timestamp:%d/%m/%Y %H:%M}."
+            )
+
+            # ------------------------------------------------
+            # PHOTOVOLTAÏQUE
+            # ------------------------------------------------
+
+            st.markdown(
+                '<h2 class="section-title">'
+                '☀️ Production photovoltaïque'
+                '</h2>',
+                unsafe_allow_html=True
+            )
+
+            pv1, pv2, pv3, pv4 = st.columns(4)
+
+            pv1.metric(
+                "Valeur actuelle",
+                format_value(row["PV_production"])
+            )
+
+            pv2.metric(
+                "Prévision à +1 h",
+                format_value(row["PV_predit"])
+            )
+
+            pv3.metric(
+                "Valeur réelle à +1 h",
+                format_value(row["PV_reel"])
+            )
+
+            pv4.metric(
+                "Erreur absolue",
+                format_value(abs(row["PV_erreur"]))
+            )
+
+            # ------------------------------------------------
+            # ÉOLIEN
+            # ------------------------------------------------
+
+            st.markdown(
+                '<h2 class="section-title">'
+                '🌬️ Production éolienne'
+                '</h2>',
+                unsafe_allow_html=True
+            )
+
+            wind1, wind2, wind3, wind4 = st.columns(4)
+
+            wind1.metric(
+                "Valeur actuelle",
+                format_value(row["Wind_production"])
+            )
+
+            wind2.metric(
+                "Prévision à +1 h",
+                format_value(row["Wind_predit"])
+            )
+
+            wind3.metric(
+                "Valeur réelle à +1 h",
+                format_value(row["Wind_reel"])
+            )
+
+            wind4.metric(
+                "Erreur absolue",
+                format_value(abs(row["Wind_erreur"]))
+            )
+
+            # ------------------------------------------------
+            # DEMANDE
+            # ------------------------------------------------
+
+            st.markdown(
+                '<h2 class="section-title">'
+                '⚡ Demande électrique'
+                '</h2>',
+                unsafe_allow_html=True
+            )
+
+            demand1, demand2, demand3, demand4 = st.columns(4)
+
+            demand1.metric(
+                "Valeur actuelle",
+                format_value(row["Electric_demand"])
+            )
+
+            demand2.metric(
+                "Prévision à +1 h",
+                format_value(row["Demand_predit"])
+            )
+
+            demand3.metric(
+                "Valeur réelle à +1 h",
+                format_value(row["Demand_reel"])
+            )
+
+            demand4.metric(
+                "Erreur absolue",
+                format_value(abs(row["Demand_erreur"]))
+            )
+
+            # ------------------------------------------------
+            # TABLEAU SYNTHÈSE
+            # ------------------------------------------------
+
+            st.markdown(
+                '<h2 class="section-title">'
+                'Synthèse de la prévision'
+                '</h2>',
+                unsafe_allow_html=True
+            )
+
+            comparison_table = pd.DataFrame(
+                {
+                    "Cible": [
+                        "Production photovoltaïque",
+                        "Production éolienne",
+                        "Demande électrique"
+                    ],
+                    "Valeur actuelle": [
+                        row["PV_production"],
+                        row["Wind_production"],
+                        row["Electric_demand"]
+                    ],
+                    "Prévision H+1": [
+                        row["PV_predit"],
+                        row["Wind_predit"],
+                        row["Demand_predit"]
+                    ],
+                    "Réel H+1": [
+                        row["PV_reel"],
+                        row["Wind_reel"],
+                        row["Demand_reel"]
+                    ],
+                    "Erreur signée": [
+                        row["PV_erreur"],
+                        row["Wind_erreur"],
+                        row["Demand_erreur"]
+                    ],
+                    "Erreur absolue": [
+                        abs(row["PV_erreur"]),
+                        abs(row["Wind_erreur"]),
+                        abs(row["Demand_erreur"])
+                    ]
+                }
+            )
+
+            numeric_demo_columns = [
+                "Valeur actuelle",
+                "Prévision H+1",
+                "Réel H+1",
+                "Erreur signée",
+                "Erreur absolue"
+            ]
+
+            comparison_table[numeric_demo_columns] = (
+                comparison_table[numeric_demo_columns]
+                .round(2)
+            )
+
+            st.dataframe(
+                comparison_table,
+                use_container_width=True,
+                hide_index=True
+            )
+
+            # ------------------------------------------------
+            # GRAPHIQUE PRÉDIT VS RÉEL
+            # ------------------------------------------------
+
+            chart_table = comparison_table[
+                [
+                    "Cible",
+                    "Prévision H+1",
+                    "Réel H+1"
+                ]
+            ].copy()
+
+            comparison_figure = px.bar(
+                chart_table,
+                x="Cible",
+                y=[
+                    "Prévision H+1",
+                    "Réel H+1"
+                ],
+                barmode="group",
+                title=(
+                    "Prévisions et valeurs réellement "
+                    "observées à +1 heure"
+                ),
+                labels={
+                    "value": "Valeur",
+                    "variable": "Série"
+                },
+                color_discrete_map={
+                    "Prévision H+1": "#0891b2",
+                    "Réel H+1": "#102a43"
+                }
+            )
+
+            comparison_figure = apply_energy_theme(
+                comparison_figure,
+                height=480
+            )
+
+            st.plotly_chart(
+                comparison_figure,
+                use_container_width=True
+            )
+
+            # ------------------------------------------------
+            # BASELINE NAÏVE
+            # ------------------------------------------------
+
+            with st.expander(
+                "Comparer également avec la baseline naïve"
+            ):
+
+                baseline_columns = [
+                    "PV_naif",
+                    "Wind_naif",
+                    "Demand_naif"
+                ]
+
+                if all(
+                    column in row.index
+                    for column in baseline_columns
+                ):
+
+                    baseline_table = pd.DataFrame(
+                        {
+                            "Cible": [
+                                "Production photovoltaïque",
+                                "Production éolienne",
+                                "Demande électrique"
+                            ],
+                            "Modèle ML": [
+                                row["PV_predit"],
+                                row["Wind_predit"],
+                                row["Demand_predit"]
+                            ],
+                            "Baseline naïve": [
+                                row["PV_naif"],
+                                row["Wind_naif"],
+                                row["Demand_naif"]
+                            ],
+                            "Réel H+1": [
+                                row["PV_reel"],
+                                row["Wind_reel"],
+                                row["Demand_reel"]
+                            ]
+                        }
+                    )
+
+                    baseline_table[
+                        [
+                            "Modèle ML",
+                            "Baseline naïve",
+                            "Réel H+1"
+                        ]
+                    ] = (
+                        baseline_table[
+                            [
+                                "Modèle ML",
+                                "Baseline naïve",
+                                "Réel H+1"
+                            ]
+                        ]
+                        .round(2)
+                    )
+
+                    st.dataframe(
+                        baseline_table,
+                        use_container_width=True,
+                        hide_index=True
+                    )
+
+                else:
+
+                    st.info(
+                        "Les colonnes de la baseline naïve ne sont "
+                        "pas disponibles dans ce fichier."
+                    )
+
+
+# ============================================================
+# 12. PAGE EXPLORATION
+# ============================================================
 
 elif page == "📊 Exploration des données":
-
 
     variable_options = {
         "Température": "Temperature",
@@ -684,7 +1208,9 @@ elif page == "📊 Exploration des données":
     )
 
     st.markdown(
-        '<h2 class="section-title">Statistiques descriptives</h2>',
+        '<h2 class="section-title">'
+        'Statistiques descriptives'
+        '</h2>',
         unsafe_allow_html=True
     )
 
@@ -718,10 +1244,11 @@ elif page == "📊 Exploration des données":
     )
 
 
-# 11. PAGE PHOTOVOLTAÏQUE
+# ============================================================
+# 13. PAGE PHOTOVOLTAÏQUE
+# ============================================================
 
 elif page == "☀️ Production photovoltaïque":
-
 
     col1, col2, col3 = st.columns(3)
 
@@ -745,19 +1272,24 @@ elif page == "☀️ Production photovoltaïque":
         "PV_production",
         "Évolution de la production photovoltaïque",
         "Production photovoltaïque",
-        color="#f59e0b"
+        color="#16A085"
     )
 
     display_real_vs_target(
         filtered_df,
         "PV_production",
         "target_PV_production_1h",
-        "Production actuelle et production observée une heure plus tard",
+        (
+            "Production actuelle et production observée "
+            "une heure plus tard"
+        ),
         "Production photovoltaïque"
     )
 
     st.markdown(
-        '<h2 class="section-title">Évaluation finale du modèle</h2>',
+        '<h2 class="section-title">'
+        'Évaluation finale du modèle'
+        '</h2>',
         unsafe_allow_html=True
     )
 
@@ -772,10 +1304,11 @@ elif page == "☀️ Production photovoltaïque":
     )
 
 
-# 12. PAGE ÉOLIENNE
+# ============================================================
+# 14. PAGE ÉOLIENNE
+# ============================================================
 
 elif page == "🌬️ Production éolienne":
-
 
     col1, col2, col3 = st.columns(3)
 
@@ -799,19 +1332,24 @@ elif page == "🌬️ Production éolienne":
         "Wind_production",
         "Évolution de la production éolienne",
         "Production éolienne",
-        color="#0891b2"
+        color="#2F80ED"
     )
 
     display_real_vs_target(
         filtered_df,
         "Wind_production",
         "target_Wind_production_1h",
-        "Production actuelle et production observée une heure plus tard",
+        (
+            "Production actuelle et production observée "
+            "une heure plus tard"
+        ),
         "Production éolienne"
     )
 
     st.markdown(
-        '<h2 class="section-title">Évaluation finale du modèle</h2>',
+        '<h2 class="section-title">'
+        'Évaluation finale du modèle'
+        '</h2>',
         unsafe_allow_html=True
     )
 
@@ -826,10 +1364,11 @@ elif page == "🌬️ Production éolienne":
     )
 
 
-# 13. PAGE DEMANDE ÉLECTRIQUE
+# ============================================================
+# 15. PAGE DEMANDE ÉLECTRIQUE
+# ============================================================
 
 elif page == "⚡ Demande électrique":
-
 
     col1, col2, col3 = st.columns(3)
 
@@ -853,19 +1392,24 @@ elif page == "⚡ Demande électrique":
         "Electric_demand",
         "Évolution de la demande électrique",
         "Demande électrique",
-        color="#7c3aed"
+        color="#E66B32"
     )
 
     display_real_vs_target(
         filtered_df,
         "Electric_demand",
         "target_Electric_demand_1h",
-        "Demande actuelle et demande observée une heure plus tard",
+        (
+            "Demande actuelle et demande observée "
+            "une heure plus tard"
+        ),
         "Demande électrique"
     )
 
     st.markdown(
-        '<h2 class="section-title">Évaluation finale du modèle</h2>',
+        '<h2 class="section-title">'
+        'Évaluation finale du modèle'
+        '</h2>',
         unsafe_allow_html=True
     )
 
@@ -880,17 +1424,20 @@ elif page == "⚡ Demande électrique":
     )
 
 
-# 14. PAGE PERFORMANCES
+# ============================================================
+# 16. PAGE PERFORMANCES
+# ============================================================
 
 elif page == "📈 Performances des modèles":
 
-
     st.markdown(
         """
-        Les performances présentées ci-dessous ont été calculées sur
-        l’ensemble de test, jamais utilisé lors de l’entraînement ni lors
-        de la sélection des modèles. Les modèles retenus sont comparés à
-        une baseline naïve saisonnière journalière.
+Les performances présentées ci-dessous ont été calculées sur
+l'ensemble de test, jamais utilisé lors de l'entraînement ni lors
+de la sélection des modèles.
+
+Les modèles retenus sont également comparés à une baseline
+naïve saisonnière journalière.
         """
     )
 
@@ -903,14 +1450,18 @@ elif page == "📈 Performances des modèles":
         "Gain_RMSE_vs_naif_%"
     }
 
-    missing_columns = required_columns.difference(results_df.columns)
+    missing_columns = required_columns.difference(
+        results_df.columns
+    )
 
     if missing_columns:
+
         st.error(
-            "Le fichier final_test_results.csv ne contient pas toutes "
-            "les colonnes attendues : "
+            "Le fichier final_test_results.csv ne contient pas "
+            "toutes les colonnes attendues : "
             + ", ".join(sorted(missing_columns))
         )
+
         st.stop()
 
     display_results = results_df.copy()
@@ -934,15 +1485,14 @@ elif page == "📈 Performances des modèles":
     )
 
     model_results = results_df[
-        results_df["Modèle"] != "Naïf saisonnier journalier"
-    ].copy()
-
-    baseline_results = results_df[
-        results_df["Modèle"] == "Naïf saisonnier journalier"
+        results_df["Modèle"]
+        != "Naïf saisonnier journalier"
     ].copy()
 
     st.markdown(
-        '<h2 class="section-title">Gains par rapport à la baseline</h2>',
+        '<h2 class="section-title">'
+        'Gains par rapport à la baseline'
+        '</h2>',
         unsafe_allow_html=True
     )
 
@@ -950,17 +1500,24 @@ elif page == "📈 Performances des modèles":
         max(1, len(model_results))
     )
 
-    for column, (_, row) in zip(
+    for column, (_, result_row) in zip(
         metric_columns,
         model_results.iterrows()
     ):
+
         column.metric(
-            label=row["Cible"],
-            value=f'{row["Gain_RMSE_vs_naif_%"]:.1f} %',
+            label=result_row["Cible"],
+            value=(
+                f'{result_row["Gain_RMSE_vs_naif_%"]:.1f} %'
+            ),
             delta="Réduction du RMSE"
         )
 
     comparison_results = results_df.copy()
+
+    # --------------------------------------------------------
+    # RMSE TEST
+    # --------------------------------------------------------
 
     rmse_figure = px.bar(
         comparison_results,
@@ -971,9 +1528,9 @@ elif page == "📈 Performances des modèles":
         title="RMSE : modèles retenus et baseline saisonnière",
         text_auto=".1f",
         color_discrete_map={
-            "HistGradientBoosting": "#0f766e",
-            "Régression linéaire": "#f59e0b",
-            "Naïf saisonnier journalier": "#64748b"
+            "HistGradientBoosting": "#16A085",
+            "Régression linéaire": "#F59E0B",
+            "Naïf saisonnier journalier": "#2F80ED"
         }
     )
 
@@ -991,6 +1548,10 @@ elif page == "📈 Performances des modèles":
         use_container_width=True
     )
 
+    # --------------------------------------------------------
+    # R² TEST
+    # --------------------------------------------------------
+
     r2_figure = px.bar(
         comparison_results,
         x="Cible",
@@ -1000,9 +1561,9 @@ elif page == "📈 Performances des modèles":
         title="Coefficient de détermination sur le jeu de test",
         text_auto=".3f",
         color_discrete_map={
-            "HistGradientBoosting": "#0f766e",
-            "Régression linéaire": "#f59e0b",
-            "Naïf saisonnier journalier": "#64748b"
+            "HistGradientBoosting": "#16A085",
+            "Régression linéaire": "#F59E0B",
+            "Naïf saisonnier journalier": "#2F80ED"
         }
     )
 
@@ -1020,6 +1581,214 @@ elif page == "📈 Performances des modèles":
         use_container_width=True
     )
 
+    # --------------------------------------------------------
+    # WALK-FORWARD
+    # --------------------------------------------------------
+
+    st.markdown(
+        '<h2 class="section-title">'
+        'Validation temporelle walk-forward'
+        '</h2>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+La validation walk-forward a été réalisée sur **trois fenêtres
+temporelles successives**, uniquement à partir des ensembles
+d'entraînement et de validation.
+
+Le jeu de test final n'a jamais été utilisé pendant cette étape.
+
+Cette analyse permet de vérifier que les performances des modèles
+ne dépendent pas uniquement d'une seule période de validation.
+        """
+    )
+
+    walk_forward_display = walk_forward_df.copy()
+
+    walk_numeric_columns = [
+        column
+        for column in [
+            "RMSE_moyen",
+            "RMSE_ecart_type",
+            "MAE_moyenne",
+            "R2_moyen",
+            "R2_ecart_type"
+        ]
+        if column in walk_forward_display.columns
+    ]
+
+    if walk_numeric_columns:
+
+        walk_forward_display[
+            walk_numeric_columns
+        ] = (
+            walk_forward_display[
+                walk_numeric_columns
+            ]
+            .round(3)
+        )
+
+    st.dataframe(
+        walk_forward_display,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    if {
+        "Cible",
+        "RMSE_moyen"
+    }.issubset(walk_forward_df.columns):
+
+        walk_rmse_figure = px.bar(
+            walk_forward_df,
+            x="Cible",
+            y="RMSE_moyen",
+            title=(
+                "RMSE moyen lors de la validation "
+                "temporelle walk-forward"
+            ),
+            text_auto=".1f",
+            color="Cible",
+            color_discrete_map={
+                "Production photovoltaïque": "#16A085",
+                "Production éolienne": "#2F80ED",
+                "Demande électrique": "#E66B32"
+            }
+        )
+
+        walk_rmse_figure.update_traces(
+            textposition="outside"
+        )
+
+        walk_rmse_figure.update_layout(
+            showlegend=False
+        )
+
+        walk_rmse_figure = apply_energy_theme(
+            walk_rmse_figure,
+            height=470
+        )
+
+        st.plotly_chart(
+            walk_rmse_figure,
+            use_container_width=True
+        )
+
+    # --------------------------------------------------------
+    # VALIDATION EXTERNE ALLEMAGNE
+    # --------------------------------------------------------
+
+    st.markdown(
+        '<h2 class="section-title">'
+        'Validation externe — Allemagne'
+        '</h2>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+Afin d'évaluer la **transférabilité de la méthodologie H+1**, le même
+protocole général a été appliqué à un jeu de données énergétique externe
+indépendant relatif au système électrique allemand (OPSD / ENTSO-E).
+
+Les modèles ont été **réentraînés sur les données allemandes** : cette
+expérience évalue donc la transférabilité de la démarche méthodologique,
+et non le transfert direct des modèles entraînés sur le dataset principal.
+        """
+    )
+
+    external_display = external_validation_df.copy()
+
+    external_numeric_columns = [
+        column
+        for column in [
+            "MAE modèle",
+            "RMSE modèle",
+            "R2 modèle",
+            "RMSE baseline",
+            "Gain RMSE vs baseline (%)",
+        ]
+        if column in external_display.columns
+    ]
+
+    if external_numeric_columns:
+        external_display[external_numeric_columns] = (
+            external_display[external_numeric_columns]
+            .round(3)
+        )
+
+    st.dataframe(
+        external_display,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    required_external_columns = {
+        "Cible",
+        "Gain RMSE vs baseline (%)"
+    }
+
+    if required_external_columns.issubset(
+        external_validation_df.columns
+    ):
+
+        external_gain_columns = st.columns(
+            len(external_validation_df)
+        )
+
+        for column, (_, result_row) in zip(
+            external_gain_columns,
+            external_validation_df.iterrows()
+        ):
+
+            column.metric(
+                label=result_row["Cible"],
+                value=(
+                    f'{result_row["Gain RMSE vs baseline (%)"]:.1f} %'
+                ),
+                delta="Gain RMSE externe"
+            )
+
+    show_saved_figure(
+        "external_validation_germany_rmse_vs_baseline.png",
+        (
+            "Validation externe Allemagne — RMSE du modèle retenu "
+            "comparé à la baseline naïve"
+        )
+    )
+
+    st.markdown(
+        """
+**Lecture des résultats externes :** la méthodologie conserve une forte
+valeur ajoutée pour la production photovoltaïque et la demande électrique.
+Pour l'éolien, le coefficient R² reste élevé mais le gain par rapport à la
+persistance est faible, ce qui montre l'importance de disposer de variables
+météorologiques directement liées au vent.
+        """
+    )
+
+    # --------------------------------------------------------
+    # ANALYSE TEMPORELLE DES ERREURS
+    # --------------------------------------------------------
+
+    st.markdown(
+        '<h2 class="section-title">'
+        'Analyse temporelle des erreurs'
+        '</h2>',
+        unsafe_allow_html=True
+    )
+
+    show_saved_figure(
+        "mean_absolute_error_by_hour.png",
+        "Erreur absolue moyenne selon l'heure de la journée"
+    )
+
+    # --------------------------------------------------------
+    # TÉLÉCHARGEMENT
+    # --------------------------------------------------------
+
     csv_data = (
         results_df
         .to_csv(index=False)
@@ -1034,42 +1803,136 @@ elif page == "📈 Performances des modèles":
     )
 
 
-# 15. PAGE À PROPOS
+# ============================================================
+# 17. PAGE À PROPOS
+# ============================================================
 
 elif page == "ℹ️ À propos":
 
-
     st.markdown(
         """
-        ## Objectif
+## Objectif
 
-        Développer un système de prévision à court terme permettant
-        d’estimer une heure à l’avance :
+Développer un système de prévision à court terme permettant
+d'estimer une heure à l'avance :
 
-        - la production photovoltaïque ;
-        - la production éolienne ;
-        - la demande électrique.
+- la production photovoltaïque ;
+- la production éolienne ;
+- la demande électrique.
 
-        ## Méthodologie
+## Méthodologie
 
-        Le projet repose sur un pipeline complet comprenant :
+Le projet repose sur un pipeline complet comprenant :
 
-        - l’audit et le contrôle de qualité des données ;
-        - le prétraitement ;
-        - l’analyse exploratoire ;
-        - l’ingénierie des caractéristiques ;
-        - la modélisation prédictive ;
-        - la validation et l’évaluation finale ;
-        - la création d’une application interactive.
+- l'audit et le contrôle de qualité des données ;
+- le prétraitement ;
+- l'analyse exploratoire ;
+- l'ingénierie des caractéristiques ;
+- la création des cibles de prévision à H+1 ;
+- la modélisation prédictive ;
+- la sélection des modèles sur validation ;
+- la validation temporelle walk-forward ;
+- une validation externe sur un jeu de données allemand indépendant ;
+- l'évaluation finale sur un jeu de test indépendant ;
+- la comparaison avec une baseline saisonnière ;
+- l'analyse des erreurs ;
+- la restitution dans Power BI et Streamlit.
 
-        ## Modèles retenus
+## Modèles retenus
 
-        - **Photovoltaïque :** HistGradientBoosting  
-        - **Éolien :** Régression linéaire  
-        - **Demande électrique :** HistGradientBoosting
+- **Photovoltaïque :** HistGradientBoosting
+- **Éolien :** Régression linéaire
+- **Demande électrique :** HistGradientBoosting
 
-        ## Technologies
+## Validation
 
-        Python, Pandas, NumPy, scikit-learn, Plotly et Streamlit.
+Les données sont séparées chronologiquement afin de respecter
+la structure temporelle du problème.
+
+La stratégie utilisée repose sur :
+
+- **70 %** des observations pour l'entraînement ;
+- **15 %** pour la validation ;
+- **15 %** pour le test final.
+
+Le jeu de test final est constitué des observations les plus
+récentes et n'est pas utilisé pour entraîner ou sélectionner
+les modèles.
+
+Une validation temporelle de type **walk-forward** a également
+été réalisée sur **trois fenêtres successives**, uniquement à partir
+des données d'entraînement et de validation.
+
+Cette approche permet d'étudier la stabilité des performances
+dans le temps tout en préservant totalement le jeu de test final.
+
+Une **validation externe** a également été réalisée sur des séries horaires
+allemandes issues d'Open Power System Data / ENTSO-E. Les modèles ont été
+réentraînés sur ce second jeu de données afin de tester la transférabilité
+de la méthodologie H+1 dans un contexte énergétique indépendant. Les gains
+de RMSE par rapport à la baseline atteignent environ **79,0 %** pour le
+photovoltaïque, **75,7 %** pour la demande électrique et **1,3 %** pour
+l'éolien.
+
+## Baseline de référence
+
+Les modèles de Machine Learning sont comparés à une baseline
+naïve saisonnière journalière.
+
+Cette baseline utilise comme référence la valeur observée au même
+instant de la journée précédente.
+
+Cette comparaison permet de vérifier que les modèles apportent
+une amélioration réelle par rapport à une stratégie simple.
+
+## Démonstration H+1
+
+L'application permet de sélectionner un instant du jeu de test et
+de rejouer une situation de prévision historique.
+
+Pour chaque cible, elle présente :
+
+- la valeur disponible à l'instant **t** ;
+- la prévision du modèle pour **t + 1 heure** ;
+- la valeur réellement observée à **t + 1 heure** ;
+- l'erreur de prédiction correspondante.
+
+Cette démonstration permet d'illustrer concrètement le
+fonctionnement du système sans prétendre réaliser une prévision
+temps réel sur des données futures inconnues.
+
+## Limites
+
+Malgré les bonnes performances obtenues, plusieurs limites doivent
+être prises en compte :
+
+- les résultats ont été obtenus sur un jeu de données et une période
+  historique déterminés ;
+- une validation externe a été réalisée sur l'Allemagne, mais la
+  généralisation à d'autres pays, sites et contextes énergétiques reste
+  à approfondir ;
+- l'horizon de prévision est actuellement limité à +1 heure ;
+- certaines périodes présentent des erreurs plus importantes,
+  notamment pour la production photovoltaïque ;
+- l'application constitue un prototype et n'est pas encore connectée
+  à des flux de données temps réel.
+
+## Perspectives
+
+Plusieurs prolongements sont envisageables :
+
+- étendre la validation externe à d'autres pays, périodes et sites ;
+- extension à plusieurs horizons de prévision, par exemple +2 h,
+  +6 h ou +24 h ;
+- intégration de véritables prévisions météorologiques disponibles
+  au moment de la prédiction ;
+- connexion à des flux de données énergétiques en temps réel ;
+- mise en place d'un mécanisme de réentraînement périodique ;
+- surveillance de la dérive des données et des performances ;
+- étude de modèles temporels plus avancés lorsque cela est justifié.
+
+## Technologies
+
+Python, Pandas, NumPy, scikit-learn, Plotly, Streamlit et Power BI.
         """
     )

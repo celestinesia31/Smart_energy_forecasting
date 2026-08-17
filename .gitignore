@@ -19,3 +19,9 @@ data/processed/energy_features_1h.csv
 Thumbs.db
 data/raw/time_series_60min_singleindex.csv
 data/raw/weather_data.csv
+
+# Données brutes volumineuses
+data/raw/*.csv
+
+# Environnements temporaires éventuels
+.venv_test/
