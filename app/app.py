@@ -1,6 +1,4 @@
-# ============================================================
 # APPLICATION STREAMLIT - PRÉVISION ÉNERGÉTIQUE H+1
-# ============================================================
 
 from pathlib import Path
 
@@ -9,9 +7,7 @@ import plotly.express as px
 import streamlit as st
 
 
-# ============================================================
 # 1. CONFIGURATION DE LA PAGE
-# ============================================================
 
 st.set_page_config(
     page_title="Prévision énergétique",
@@ -21,9 +17,7 @@ st.set_page_config(
 )
 
 
-# ============================================================
 # 2. THÈME VISUEL PERSONNALISÉ
-# ============================================================
 
 st.markdown(
     """
@@ -253,9 +247,7 @@ footer {
 )
 
 
-# ============================================================
 # 3. DÉFINITION DES CHEMINS
-# ============================================================
 
 APP_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = APP_DIR.parent
@@ -269,11 +261,10 @@ FINAL_RESULTS_FILE = RESULTS_DIR / "final_test_results.csv"
 POWERBI_PREDICTIONS_FILE = RESULTS_DIR / "powerbi_predictions.csv"
 WALK_FORWARD_SUMMARY_FILE = RESULTS_DIR / "walk_forward_summary.csv"
 EXTERNAL_VALIDATION_FILE = RESULTS_DIR / "external_validation_germany.csv"
+MOROCCO_TRANSFERABILITY_FILE = RESULTS_DIR / "morocco_transferability_results.csv"
 
 
-# ============================================================
 # 4. CHARGEMENT DES DONNÉES
-# ============================================================
 
 @st.cache_data
 def load_dashboard_data() -> pd.DataFrame:
@@ -360,6 +351,20 @@ def load_external_validation() -> pd.DataFrame:
     return pd.read_csv(EXTERNAL_VALIDATION_FILE)
 
 
+@st.cache_data
+def load_morocco_transferability() -> pd.DataFrame:
+    """
+    Charge les résultats de l'étude de transférabilité au contexte marocain.
+    """
+
+    if not MOROCCO_TRANSFERABILITY_FILE.exists():
+        raise FileNotFoundError(
+            f"Fichier introuvable : {MOROCCO_TRANSFERABILITY_FILE}"
+        )
+
+    return pd.read_csv(MOROCCO_TRANSFERABILITY_FILE)
+
+
 try:
 
     energy_df = load_dashboard_data()
@@ -367,6 +372,7 @@ try:
     predictions_df = load_test_predictions()
     walk_forward_df = load_walk_forward_summary()
     external_validation_df = load_external_validation()
+    morocco_transferability_df = load_morocco_transferability()
 
 except FileNotFoundError as error:
 
@@ -380,9 +386,7 @@ except FileNotFoundError as error:
     st.stop()
 
 
-# ============================================================
 # 5. FONCTIONS UTILITAIRES
-# ============================================================
 
 def apply_energy_theme(
     figure,
@@ -564,9 +568,7 @@ def format_value(value) -> str:
     return f"{float(value):,.2f}".replace(",", " ")
 
 
-# ============================================================
 # 6. PRÉPARATION DES DONNÉES POUR LA DÉMONSTRATION H+1
-# ============================================================
 
 current_values = (
     energy_df[
@@ -594,9 +596,7 @@ demo_df = (
 )
 
 
-# ============================================================
 # 7. BARRE LATÉRALE
-# ============================================================
 
 st.sidebar.title("⚡ Navigation")
 
@@ -633,9 +633,7 @@ st.sidebar.write(
 )
 
 
-# ============================================================
 # 8. FILTRE TEMPOREL GLOBAL
-# ============================================================
 
 minimum_date = energy_df["Time"].min().date()
 maximum_date = energy_df["Time"].max().date()
@@ -673,17 +671,13 @@ if filtered_df.empty:
     st.stop()
 
 
-# ============================================================
 # 9. TITRE DES PAGES
-# ============================================================
 
 if page != "🏠 Accueil":
     st.title(page)
 
 
-# ============================================================
 # 10. PAGE ACCUEIL
-# ============================================================
 
 if page == "🏠 Accueil":
 
@@ -801,9 +795,7 @@ des conditions météorologiques et des valeurs retardées.
     )
 
 
-# ============================================================
 # 11. PAGE DÉMONSTRATION H+1
-# ============================================================
 
 elif page == "🎯 Démonstration H+1":
 
@@ -893,9 +885,7 @@ Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
                 f"{forecast_timestamp:%d/%m/%Y %H:%M}."
             )
 
-            # ------------------------------------------------
             # PHOTOVOLTAÏQUE
-            # ------------------------------------------------
 
             st.markdown(
                 '<h2 class="section-title">'
@@ -926,9 +916,7 @@ Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
                 format_value(abs(row["PV_erreur"]))
             )
 
-            # ------------------------------------------------
             # ÉOLIEN
-            # ------------------------------------------------
 
             st.markdown(
                 '<h2 class="section-title">'
@@ -959,9 +947,7 @@ Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
                 format_value(abs(row["Wind_erreur"]))
             )
 
-            # ------------------------------------------------
             # DEMANDE
-            # ------------------------------------------------
 
             st.markdown(
                 '<h2 class="section-title">'
@@ -992,9 +978,7 @@ Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
                 format_value(abs(row["Demand_erreur"]))
             )
 
-            # ------------------------------------------------
             # TABLEAU SYNTHÈSE
-            # ------------------------------------------------
 
             st.markdown(
                 '<h2 class="section-title">'
@@ -1057,9 +1041,7 @@ Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
                 hide_index=True
             )
 
-            # ------------------------------------------------
             # GRAPHIQUE PRÉDIT VS RÉEL
-            # ------------------------------------------------
 
             chart_table = comparison_table[
                 [
@@ -1101,9 +1083,7 @@ Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
                 use_container_width=True
             )
 
-            # ------------------------------------------------
             # BASELINE NAÏVE
-            # ------------------------------------------------
 
             with st.expander(
                 "Comparer également avec la baseline naïve"
@@ -1176,9 +1156,7 @@ Les prédictions sont ensuite comparées aux valeurs réellement enregistrées
                     )
 
 
-# ============================================================
 # 12. PAGE EXPLORATION
-# ============================================================
 
 elif page == "📊 Exploration des données":
 
@@ -1244,9 +1222,7 @@ elif page == "📊 Exploration des données":
     )
 
 
-# ============================================================
 # 13. PAGE PHOTOVOLTAÏQUE
-# ============================================================
 
 elif page == "☀️ Production photovoltaïque":
 
@@ -1304,9 +1280,7 @@ elif page == "☀️ Production photovoltaïque":
     )
 
 
-# ============================================================
 # 14. PAGE ÉOLIENNE
-# ============================================================
 
 elif page == "🌬️ Production éolienne":
 
@@ -1364,9 +1338,7 @@ elif page == "🌬️ Production éolienne":
     )
 
 
-# ============================================================
 # 15. PAGE DEMANDE ÉLECTRIQUE
-# ============================================================
 
 elif page == "⚡ Demande électrique":
 
@@ -1424,9 +1396,7 @@ elif page == "⚡ Demande électrique":
     )
 
 
-# ============================================================
 # 16. PAGE PERFORMANCES
-# ============================================================
 
 elif page == "📈 Performances des modèles":
 
@@ -1515,9 +1485,7 @@ naïve saisonnière journalière.
 
     comparison_results = results_df.copy()
 
-    # --------------------------------------------------------
     # RMSE TEST
-    # --------------------------------------------------------
 
     rmse_figure = px.bar(
         comparison_results,
@@ -1548,9 +1516,7 @@ naïve saisonnière journalière.
         use_container_width=True
     )
 
-    # --------------------------------------------------------
     # R² TEST
-    # --------------------------------------------------------
 
     r2_figure = px.bar(
         comparison_results,
@@ -1581,9 +1547,7 @@ naïve saisonnière journalière.
         use_container_width=True
     )
 
-    # --------------------------------------------------------
     # WALK-FORWARD
-    # --------------------------------------------------------
 
     st.markdown(
         '<h2 class="section-title">'
@@ -1676,13 +1640,11 @@ ne dépendent pas uniquement d'une seule période de validation.
             use_container_width=True
         )
 
-    # --------------------------------------------------------
-    # VALIDATION EXTERNE ALLEMAGNE
-    # --------------------------------------------------------
+    # VALIDATION EXTERNE / ALLEMAGNE
 
     st.markdown(
         '<h2 class="section-title">'
-        'Validation externe — Allemagne'
+        'Validation externe / Allemagne'
         '</h2>',
         unsafe_allow_html=True
     )
@@ -1769,9 +1731,124 @@ météorologiques directement liées au vent.
         """
     )
 
-    # --------------------------------------------------------
+    # TRANSFÉRABILITÉ / MAROC
+
+    st.markdown(
+        '<h2 class="section-title">'
+        'Étude de transférabilité / Maroc 🇲🇦'
+        '</h2>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+Une expérimentation complémentaire a été menée sur un jeu de données
+horaire national pour le Maroc afin d'étudier la **transférabilité de la
+méthodologie H+1 dans un autre contexte géographique et énergétique**.
+
+Contrairement au cas allemand, les séries solaire et éolienne utilisées ici
+sont des **facteurs de capacité modélisés**, et la demande correspond à un
+profil national modélisé. Cette partie ne constitue donc pas une validation
+opérationnelle du réseau marocain, mais une étude méthodologique complémentaire.
+        """
+    )
+
+    morocco_display = morocco_transferability_df.copy()
+
+    morocco_numeric_columns = [
+        column
+        for column in [
+            "MAE_test",
+            "RMSE_test",
+            "R2_test",
+            "RMSE_baseline",
+            "Gain_RMSE_vs_baseline_%",
+        ]
+        if column in morocco_display.columns
+    ]
+
+    if morocco_numeric_columns:
+        morocco_display[morocco_numeric_columns] = (
+            morocco_display[morocco_numeric_columns]
+            .round(4)
+        )
+
+    st.dataframe(
+        morocco_display,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    required_morocco_columns = {
+        "Cible",
+        "Gain_RMSE_vs_baseline_%"
+    }
+
+    if required_morocco_columns.issubset(
+        morocco_transferability_df.columns
+    ):
+
+        morocco_gain_columns = st.columns(
+            len(morocco_transferability_df)
+        )
+
+        for column, (_, result_row) in zip(
+            morocco_gain_columns,
+            morocco_transferability_df.iterrows()
+        ):
+
+            gain_value = float(
+                result_row["Gain_RMSE_vs_baseline_%"]
+            )
+
+            column.metric(
+                label=result_row["Cible"],
+                value=f"{gain_value:.1f} %",
+                delta=(
+                    "Meilleur que la baseline"
+                    if gain_value >= 0
+                    else "Moins bon que la baseline"
+                )
+            )
+
+    show_saved_figure(
+        "morocco_rmse_vs_baseline.png",
+        (
+            "Maroc — RMSE du modèle retenu comparé à la "
+            "baseline naïve"
+        )
+    )
+
+    with st.expander(
+        "Voir les courbes réel vs prédit sur le cas marocain"
+    ):
+
+        show_saved_figure(
+            "morocco_pv_real_vs_pred.png",
+            "Maroc — photovoltaïque : réel vs prédit"
+        )
+
+        show_saved_figure(
+            "morocco_wind_real_vs_pred.png",
+            "Maroc — éolien : réel vs prédit"
+        )
+
+        show_saved_figure(
+            "morocco_demand_real_vs_pred.png",
+            "Maroc — demande électrique : réel vs prédit"
+        )
+
+    st.markdown(
+        """
+**Lecture du cas marocain :** HistGradientBoosting conserve une forte valeur
+ajoutée pour le photovoltaïque et la demande. Pour l'éolien, la régression
+linéaire retenue sur validation obtient finalement un résultat légèrement
+moins bon que la baseline sur le test final. Ce résultat est conservé tel quel
+afin de préserver l'indépendance du test.
+        """
+    )
+
     # ANALYSE TEMPORELLE DES ERREURS
-    # --------------------------------------------------------
 
     st.markdown(
         '<h2 class="section-title">'
@@ -1785,9 +1862,7 @@ météorologiques directement liées au vent.
         "Erreur absolue moyenne selon l'heure de la journée"
     )
 
-    # --------------------------------------------------------
     # TÉLÉCHARGEMENT
-    # --------------------------------------------------------
 
     csv_data = (
         results_df
@@ -1803,9 +1878,7 @@ météorologiques directement liées au vent.
     )
 
 
-# ============================================================
 # 17. PAGE À PROPOS
-# ============================================================
 
 elif page == "ℹ️ À propos":
 
@@ -1833,6 +1906,7 @@ Le projet repose sur un pipeline complet comprenant :
 - la sélection des modèles sur validation ;
 - la validation temporelle walk-forward ;
 - une validation externe sur un jeu de données allemand indépendant ;
+- une étude complémentaire de transférabilité au contexte marocain ;
 - l'évaluation finale sur un jeu de test indépendant ;
 - la comparaison avec une baseline saisonnière ;
 - l'analyse des erreurs ;
@@ -1874,6 +1948,14 @@ de RMSE par rapport à la baseline atteignent environ **79,0 %** pour le
 photovoltaïque, **75,7 %** pour la demande électrique et **1,3 %** pour
 l'éolien.
 
+Une **étude complémentaire de transférabilité au Maroc** a ensuite été menée
+sur des profils horaires nationaux modélisés pour 2015. Sur le test final,
+le gain de RMSE atteint environ **76,0 %** pour le photovoltaïque et
+**79,7 %** pour la demande électrique. Pour l'éolien, le modèle retenu sur
+validation est légèrement moins performant que la baseline sur le test
+(**-3,3 %**). Ce résultat est conservé sans resélection afin de préserver
+l'indépendance du jeu de test.
+
 ## Baseline de référence
 
 Les modèles de Machine Learning sont comparés à une baseline
@@ -1908,9 +1990,12 @@ Malgré les bonnes performances obtenues, plusieurs limites doivent
 
 - les résultats ont été obtenus sur un jeu de données et une période
   historique déterminés ;
-- une validation externe a été réalisée sur l'Allemagne, mais la
-  généralisation à d'autres pays, sites et contextes énergétiques reste
-  à approfondir ;
+- une validation externe a été réalisée sur l'Allemagne et une étude
+  complémentaire de transférabilité a été menée sur le Maroc, mais la
+  généralisation opérationnelle à d'autres pays, sites et systèmes réels
+  reste à approfondir ;
+- le cas marocain repose sur des profils modélisés et ne constitue pas une
+  validation opérationnelle du réseau électrique marocain ;
 - l'horizon de prévision est actuellement limité à +1 heure ;
 - certaines périodes présentent des erreurs plus importantes,
   notamment pour la production photovoltaïque ;
@@ -1921,7 +2006,7 @@ Malgré les bonnes performances obtenues, plusieurs limites doivent
 
 Plusieurs prolongements sont envisageables :
 
-- étendre la validation externe à d'autres pays, périodes et sites ;
+- étendre la validation externe à d'autres pays, périodes et sites réels ;
 - extension à plusieurs horizons de prévision, par exemple +2 h,
   +6 h ou +24 h ;
 - intégration de véritables prévisions météorologiques disponibles
