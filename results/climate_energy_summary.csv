@@ -1,0 +1,10 @@
+Dimension,Indicateur,Résultat
+Climat long terme,Tendance température,"+0,486 °C / décennie"
+Climat long terme,Tendance rayonnement solaire,"+0,045 kWh/m²/jour / décennie"
+Prévision énergétique,R² bilan énergétique,0.9901
+Prévision énergétique,MAE taux de couverture,1.43 points
+Aide à la décision,Concordance niveaux de couverture,92.34 %
+Climat-énergie,Corrélation rayonnement / PV,"Pearson r = 0,7415"
+Climat-énergie,Corrélation température / demande,"Pearson r = 0,7080"
+Adaptation climatique,Scénario le plus défavorable,Chaud et moins solaire
+Adaptation climatique,Besoin supplémentaire maximal,"6,58 %"
