@@ -9,6 +9,7 @@ https://smartenergyforecasting-64acjhxamuzmngjy35ucdt.streamlit.app/
  
 ![Prévision photovoltaïque H+1](figures/pv_prediction_vs_real.png)
 
+
 ---
 
 ## Le problème métier
@@ -23,7 +24,7 @@ Les énergies renouvelables dépendent de la météo. Un gestionnaire de réseau
 
 - **Hausse de température à Fès : +0,486 °C / décennie** (1990–2025, p = 0,0001) ; ≈ +1,38 °C entre 1990-1999 et 2016-2025.
 - **Scénario le plus défavorable (+2 °C, −10 % de rayonnement) :** couverture renouvelable de **21,21 % → 19,91 %**, soit un effort d'adaptation théorique de **6,58 %**.
-- **Honnêteté méthodologique :** sur l'éolien, le gain devient quasi nul en Allemagne (≈ 1,3 %) et négatif au Maroc (≈ −3 %). Ce résultat est volontairement conservé : le modèle n'est jamais re-sélectionné après avoir vu le test.
+- **Honnêteté méthodologique :** sur l'éolien, le gain devient quasi nul en Allemagne sur le jeu de test principal (≈ 1,3 %) et négatif au Maroc (≈ −3 %). Ce résultat est volontairement conservé : le modèle n'est jamais re-sélectionné après avoir vu le test.
 
 ## Ce qui rend l'évaluation crédible
 - Découpage **chronologique** 70 / 15 / 15, aucun mélange aléatoire, test final isolé.
