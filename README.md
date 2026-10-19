@@ -4,7 +4,6 @@
 
 **En une phrase :** un pipeline complet (données → modèles → dashboard Power BI → application Streamlit) qui prévoit à 1 heure la production photovoltaïque, éolienne et la demande électrique, puis simule l'effet de scénarios climatiques sur la couverture renouvelable.
 
-🔗 **Démo Streamlit :** `<(http://localhost:8501/)>` 
 
 ![Prévision photovoltaïque H+1](figures/pv_prediction_vs_real.png)
 
